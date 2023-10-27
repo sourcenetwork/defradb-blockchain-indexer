@@ -14,13 +14,27 @@ import (
 var schema string
 
 type Indexer struct {
-	database    client.DB
-	rpc         *RpcClient
-	chainDocKey client.DocKey
+	database     client.DB
+	rpc          *RpcClient
+	chainKey     client.DocKey
+	blocks       client.Collection
+	transactions client.Collection
 }
 
 func NewIndexer(ctx context.Context, database client.DB, url string) (*Indexer, error) {
 	_, err := database.AddSchema(ctx, schema)
+	if err != nil {
+		return nil, err
+	}
+	chains, err := database.GetCollectionByName(ctx, "Chain")
+	if err != nil {
+		return nil, err
+	}
+	blocks, err := database.GetCollectionByName(ctx, "Block")
+	if err != nil {
+		return nil, err
+	}
+	transactions, err := database.GetCollectionByName(ctx, "Transaction")
 	if err != nil {
 		return nil, err
 	}
@@ -34,11 +48,7 @@ func NewIndexer(ctx context.Context, database client.DB, url string) (*Indexer, 
 	if err != nil {
 		return nil, err
 	}
-	chainDocKey, err := chainDoc.GenerateDocKey()
-	if err != nil {
-		return nil, err
-	}
-	chains, err := database.GetCollectionByName(ctx, "Chain")
+	chainKey, err := chainDoc.GenerateDocKey()
 	if err != nil {
 		return nil, err
 	}
@@ -48,9 +58,11 @@ func NewIndexer(ctx context.Context, database client.DB, url string) (*Indexer, 
 	}
 
 	return &Indexer{
-		database:    database,
-		rpc:         rpc,
-		chainDocKey: chainDocKey,
+		database:     database,
+		rpc:          rpc,
+		chainKey:     chainKey,
+		blocks:       blocks,
+		transactions: transactions,
 	}, nil
 }
 
@@ -70,24 +82,15 @@ func (idx *Indexer) indexBlock(ctx context.Context, block *Block) error {
 	txn, err := idx.database.NewTxn(ctx, false)
 	defer txn.Discard(ctx)
 
-	blocks, err := idx.database.GetCollectionByName(ctx, "Block")
-	if err != nil {
-		return err
-	}
-	transactions, err := idx.database.GetCollectionByName(ctx, "Transaction")
-	if err != nil {
-		return err
-	}
-
 	blockDoc, err := client.NewDocFromMap(block.ToMap())
 	if err != nil {
 		return err
 	}
-	err = blockDoc.Set("chain", idx.chainDocKey.String())
+	err = blockDoc.Set("chain", idx.chainKey.String())
 	if err != nil {
 		return err
 	}
-	err = blocks.WithTxn(txn).Create(ctx, blockDoc)
+	err = idx.blocks.WithTxn(txn).Create(ctx, blockDoc)
 	if err != nil {
 		return err
 	}
@@ -105,7 +108,7 @@ func (idx *Indexer) indexBlock(ctx context.Context, block *Block) error {
 		if err != nil {
 			return err
 		}
-		err = transactions.WithTxn(txn).Create(ctx, transactionDoc)
+		err = idx.transactions.WithTxn(txn).Create(ctx, transactionDoc)
 		if err != nil {
 			return err
 		}
