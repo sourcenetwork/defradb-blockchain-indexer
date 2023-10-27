@@ -1,4 +1,10 @@
+type Chain {
+    id:      String
+    blocks:  [Block]
+}
+
 type Block {
+    chain:                 Chain  @primary
     number:                String 
     hash:                  String
     parentHash:            String

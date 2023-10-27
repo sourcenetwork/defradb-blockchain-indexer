@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type RpcRequest struct {
@@ -35,11 +36,15 @@ func (e *RpcError) Error() string {
 }
 
 type RpcClient struct {
-	url string
+	url    string
+	client *http.Client
 }
 
 func NewRpcClient(url string) *RpcClient {
-	return &RpcClient{url}
+	client := &http.Client{
+		Timeout: 5 * time.Second,
+	}
+	return &RpcClient{url, client}
 }
 
 func (c *RpcClient) call(ctx context.Context, method string, params ...any) (*RpcResponse, error) {
@@ -56,7 +61,7 @@ func (c *RpcClient) call(ctx context.Context, method string, params ...any) (*Rp
 	if err != nil {
 		return nil, err
 	}
-	res, err := http.DefaultClient.Do(req)
+	res, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -103,4 +108,20 @@ func (c *RpcClient) GetBlockByNumber(ctx context.Context, number uint64) (*Block
 		return nil, err
 	}
 	return &block, nil
+}
+
+// ChainID returns the unique identifier for the blockchain.
+func (c *RpcClient) ChainID(ctx context.Context) (string, error) {
+	res, err := c.call(ctx, "eth_chainId")
+	if err != nil {
+		return "", err
+	}
+	if res.Error != nil {
+		return "", res.Error
+	}
+	var chainID string
+	if err := json.Unmarshal(res.Result, &chainID); err != nil {
+		return "", err
+	}
+	return chainID, nil
 }
