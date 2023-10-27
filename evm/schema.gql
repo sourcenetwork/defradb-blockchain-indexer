@@ -1,0 +1,42 @@
+type Block {
+    number:                String 
+    hash:                  String
+    parentHash:            String
+    nonce:                 String
+    sha3Uncles:            String
+    logsBloom:             String
+    transactionsRoot:      String
+    stateRoot:             String
+    receiptsRoot:          String
+    miner:                 String
+    difficulty:            String
+    totalDifficulty:       String
+    extraData:             String
+    size:                  String
+    gasLimit:              String
+    gasUsed:               String
+    timestamp:             String
+    mixHash:               String
+    baseFeePerGas:         String
+    withdrawalsRoot:       String
+    blobGasUsed:           String
+    excessBlobGas:         String
+    parentBeaconBlockRoot: String
+    transactions:          [Transaction]
+}
+
+type Transaction {
+    block:            Block  @primary
+    from:             String
+    gas:              String
+    gasPrice:         String
+    hash:             String
+    input:            String
+    nonce:            String
+    to:               String
+    transactionIndex: String
+    value:            String
+    v:                String
+    r:                String
+    s:                String
+}
