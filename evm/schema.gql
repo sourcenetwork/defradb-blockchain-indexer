@@ -1,6 +1,7 @@
 type Chain {
-    id:      String
-    blocks:  [Block]
+    id:           String
+    blocks:       [Block]
+    transactions: [Transaction]
 }
 
 type Block {
@@ -32,6 +33,7 @@ type Block {
 }
 
 type Transaction {
+    chain:            Chain  @primary
     block:            Block  @primary
     from:             String
     gas:              String

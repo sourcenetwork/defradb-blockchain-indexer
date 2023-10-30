@@ -75,7 +75,7 @@ func (idx *Indexer) Start(ctx context.Context, count int) error {
 	for i := 0; i < count; i++ {
 		go func() { idx.indexBlockProcess(ctx, blockCh) }()
 	}
-	return idx.indexHeadProcess(ctx, blockCh)
+	return idx.indexHeadProcess(ctx, blockCh, nil)
 }
 
 func (idx *Indexer) indexBlock(ctx context.Context, block *Block) error {
@@ -98,9 +98,12 @@ func (idx *Indexer) indexBlock(ctx context.Context, block *Block) error {
 	if err != nil {
 		return err
 	}
-
 	for _, transaction := range block.Transactions {
 		transactionDoc, err := client.NewDocFromMap(transaction.ToMap())
+		if err != nil {
+			return err
+		}
+		err = transactionDoc.Set("chain", idx.chainKey.String())
 		if err != nil {
 			return err
 		}

@@ -10,8 +10,7 @@ import (
 var blockTime = 12 * time.Second
 
 // indexHeadProcess adds block numbers to the given channel every time a new block is added.
-func (i *Indexer) indexHeadProcess(ctx context.Context, blockCh chan<- uint64) error {
-	var head uint64
+func (i *Indexer) indexHeadProcess(ctx context.Context, blockCh chan<- uint64, head *uint64) error {
 	for {
 		select {
 		case <-time.Tick(blockTime):
@@ -20,13 +19,14 @@ func (i *Indexer) indexHeadProcess(ctx context.Context, blockCh chan<- uint64) e
 				log.Printf("failed to get block number: %v", err)
 				continue
 			}
-			if head == 0 && number > 0 {
-				head = number - 1
+			if head == nil {
+				head = &number
 			}
-			for i := head; i < number; i++ {
+			for i := *head; i <= number; i++ {
 				blockCh <- number
 			}
-			head = number
+			next := number + 1
+			head = &next
 		case <-ctx.Done():
 			return ctx.Err()
 		}
