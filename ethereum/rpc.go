@@ -1,4 +1,4 @@
-package evm
+package ethereum
 
 import (
 	"bytes"
@@ -36,15 +36,25 @@ func (e *RpcError) Error() string {
 }
 
 type RpcClient struct {
-	url    string
-	client *http.Client
+	url     string
+	client  *http.Client
+	chainID string
 }
 
-func NewRpcClient(url string) *RpcClient {
+func NewRpcClient(ctx context.Context, url string) (*RpcClient, error) {
 	client := &http.Client{
 		Timeout: 5 * time.Second,
 	}
-	return &RpcClient{url, client}
+	rpc := &RpcClient{
+		url:    url,
+		client: client,
+	}
+	chainID, err := rpc.ChainID(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rpc.chainID = chainID
+	return rpc, nil
 }
 
 func (c *RpcClient) call(ctx context.Context, method string, params ...any) (*RpcResponse, error) {
@@ -95,23 +105,26 @@ func (c *RpcClient) BlockNumber(ctx context.Context) (uint64, error) {
 }
 
 // GetBlockByNumber returns information about a block by block number.
-func (c *RpcClient) GetBlockByNumber(ctx context.Context, number uint64) (*Block, error) {
-	res, err := c.call(ctx, "eth_getBlockByNumber", fmt.Sprintf("0x%x", number), true)
+func (c *RpcClient) GetBlockByNumber(ctx context.Context, number uint64, fullTx bool) (map[string]any, error) {
+	res, err := c.call(ctx, "eth_getBlockByNumber", fmt.Sprintf("0x%x", number), fullTx)
 	if err != nil {
 		return nil, err
 	}
 	if res.Error != nil {
 		return nil, res.Error
 	}
-	var block Block
+	var block map[string]any
 	if err := json.Unmarshal(res.Result, &block); err != nil {
 		return nil, err
 	}
-	return &block, nil
+	return block, nil
 }
 
 // ChainID returns the unique identifier for the blockchain.
 func (c *RpcClient) ChainID(ctx context.Context) (string, error) {
+	if c.chainID != "" {
+		return c.chainID, nil
+	}
 	res, err := c.call(ctx, "eth_chainId")
 	if err != nil {
 		return "", err

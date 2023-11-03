@@ -1,4 +1,4 @@
-package evm
+package ethereum
 
 import (
 	"context"

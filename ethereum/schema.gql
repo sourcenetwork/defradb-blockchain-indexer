@@ -1,11 +1,5 @@
-type Chain {
-    id:           String
-    blocks:       [Block]
-    transactions: [Transaction]
-}
-
-type Block {
-    chain:                 Chain  @primary
+type EthereumBlock {
+    chainID:               String
     number:                String 
     hash:                  String
     parentHash:            String
@@ -29,12 +23,13 @@ type Block {
     blobGasUsed:           String
     excessBlobGas:         String
     parentBeaconBlockRoot: String
-    transactions:          [Transaction]
+    uncles:                [String]
 }
 
-type Transaction {
-    chain:            Chain  @primary
-    block:            Block  @primary
+type EthereumTransaction {
+    chainID:          String
+    blockHash:        String
+    blockNumber:      String
     from:             String
     gas:              String
     gasPrice:         String
@@ -47,4 +42,13 @@ type Transaction {
     v:                String
     r:                String
     s:                String
+}
+
+type EthereumWithdrawal {
+    chainID:          String
+    blockHash:        String
+    blockNumber:      String
+    index:            String
+    amount:           String
+    validatorIndex:   String
 }

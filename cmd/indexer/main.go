@@ -14,7 +14,7 @@ import (
 	"github.com/sourcenetwork/defradb/db"
 	"github.com/sourcenetwork/defradb/net"
 
-	"github.com/sourcenetwork/defradb-blockchain-indexer/evm"
+	"github.com/sourcenetwork/defradb-blockchain-indexer/ethereum"
 )
 
 var (
@@ -49,7 +49,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create node: %v", err)
 	}
-	indexer, err := evm.NewIndexer(ctx, node, *rpcFlag)
+	indexer, err := ethereum.NewIndexer(ctx, node, *rpcFlag)
 	if err != nil {
 		log.Fatalf("failed to create indexer: %v", err)
 	}

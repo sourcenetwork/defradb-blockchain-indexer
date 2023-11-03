@@ -1,4 +1,4 @@
-package evm
+package ethereum
 
 import (
 	"context"
@@ -14,7 +14,7 @@ func (i *Indexer) indexBlockProcess(ctx context.Context, blockCh <-chan uint64) 
 			if !ok {
 				return nil
 			}
-			block, err := i.rpc.GetBlockByNumber(ctx, number)
+			block, err := i.rpc.GetBlockByNumber(ctx, number, true)
 			if err != nil {
 				log.Printf("failed to get block: %v", err)
 				continue
