@@ -1,14 +1,16 @@
 module github.com/sourcenetwork/defradb-blockchain-indexer
 
-go 1.20
+go 1.21.3
 
 require (
 	github.com/dgraph-io/badger/v4 v4.1.0
 	github.com/multiformats/go-multiaddr v0.12.0
 	github.com/sourcenetwork/defradb v0.7.1-0.20231027190800-4427a1660d0f
+	github.com/umbracle/fastrlp v0.1.0
 )
 
 require (
+	github.com/DataDog/zstd v1.4.5 // indirect
 	github.com/Jorropo/jsync v1.0.1 // indirect
 	github.com/benbjohnson/clock v1.3.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
@@ -39,8 +41,9 @@ require (
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/golang/snappy v0.0.4 // indirect
+	github.com/golang/snappy v0.0.5-0.20220116011046-fa5810519dcb // indirect
 	github.com/google/flatbuffers v2.0.6+incompatible // indirect
+	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/gopacket v1.1.19 // indirect
 	github.com/google/pprof v0.0.0-20230821062121-407c9e7a662f // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -52,7 +55,7 @@ require (
 	github.com/hashicorp/golang-lru/arc/v2 v2.0.5 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.5 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/huin/goupnp v1.2.0 // indirect
+	github.com/huin/goupnp v1.3.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/ipfs/bbloom v0.0.4 // indirect
 	github.com/ipfs/boxo v0.13.1 // indirect
@@ -140,6 +143,7 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/spf13/viper v1.17.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
+	github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7 // indirect
 	github.com/tetratelabs/wazero v1.3.1 // indirect
 	github.com/textileio/go-libp2p-pubsub-rpc v0.0.9 // indirect
 	github.com/textileio/go-log/v2 v2.1.3-gke-2 // indirect
