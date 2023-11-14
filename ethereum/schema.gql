@@ -1,54 +1,52 @@
-type EthereumBlock {
-    chainID:               String
-    number:                String 
-    hash:                  String
+type EthereumHeader {
     parentHash:            String
-    nonce:                 String
     sha3Uncles:            String
-    logsBloom:             String
-    transactionsRoot:      String
-    stateRoot:             String
-    receiptsRoot:          String
     miner:                 String
+    stateRoot:             String
+    transactionsRoot:      String
+    receiptsRoot:          String
+    logsBloom:             String
     difficulty:            String
-    totalDifficulty:       String
-    extraData:             String
-    size:                  String
+    number:                String 
     gasLimit:              String
     gasUsed:               String
     timestamp:             String
-    mixHash:               String
+    extraData:             String
     baseFeePerGas:         String
     withdrawalsRoot:       String
-    blobGasUsed:           String
-    excessBlobGas:         String
-    parentBeaconBlockRoot: String
-    uncles:                [String]
 }
 
 type EthereumTransaction {
-    chainID:          String
-    blockHash:        String
-    blockNumber:      String
-    from:             String
-    gas:              String
-    gasPrice:         String
-    hash:             String
-    input:            String
-    nonce:            String
-    to:               String
-    transactionIndex: String
-    value:            String
-    v:                String
-    r:                String
-    s:                String
+    type:                 Int
+    chainId:              String
+    from:                 String
+    gas:                  String
+    gasPrice:             String
+    maxPriorityFeePerGas: String
+    maxFeePerBlobGas:     String
+    maxFeePerBlobGas:     String
+    accessList:           [EthereumAccessList]
+    blobVersionedHashes:  [String]
+    hash:                 String
+    input:                String
+    nonce:                String
+    to:                   String
+    value:                String
+    v:                    String
+    r:                    String
+    s:                    String
+    yParity:              Int
+}
+
+type EthereumAccessList {
+    transaction: EthereumTransaction @primary
+    address:     String
+    storageKeys: [String]
 }
 
 type EthereumWithdrawal {
-    chainID:          String
-    blockHash:        String
-    blockNumber:      String
     index:            String
     amount:           String
     validatorIndex:   String
+    address:          String
 }

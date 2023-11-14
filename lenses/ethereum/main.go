@@ -1,65 +1,64 @@
 package main
 
 import (
-	"bytes"
 	"encoding/hex"
 
 	"github.com/umbracle/fastrlp"
 )
 
-// validateSeal ensures that the block header matches the hash of the encoded fields
-func validateSeal(block map[string]any) (bool, error) {
+// sealHash returns the hash of a block.
+func sealHash(block map[string]any) ([]byte, error) {
 	parentHash, err := hex.DecodeString(block["parentHash"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	sha3Uncles, err := hex.DecodeString(block["sha3Uncles"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	miner, err := hex.DecodeString(block["miner"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	stateRoot, err := hex.DecodeString(block["stateRoot"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	transactionsRoot, err := hex.DecodeString(block["transactionsRoot"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	receiptsRoot, err := hex.DecodeString(block["receiptsRoot"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	logsBloom, err := hex.DecodeString(block["logsBloom"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	difficulty, err := hex.DecodeString(block["difficulty"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	number, err := hex.DecodeString(block["number"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	gasLimit, err := hex.DecodeString(block["gasLimit"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	gasUsed, err := hex.DecodeString(block["gasUsed"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	timestamp, err := hex.DecodeString(block["timestamp"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 	extraData, err := hex.DecodeString(block["extraData"].(string))
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	var baseFeePerGas []byte
@@ -67,7 +66,7 @@ func validateSeal(block map[string]any) (bool, error) {
 		baseFeePerGas, err = hex.DecodeString(val.(string))
 	}
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	var withdrawalsRoot []byte
@@ -75,7 +74,7 @@ func validateSeal(block map[string]any) (bool, error) {
 		withdrawalsRoot, err = hex.DecodeString(val.(string))
 	}
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	rlp := &fastrlp.Arena{}
@@ -101,13 +100,9 @@ func validateSeal(block map[string]any) (bool, error) {
 		enc.Set(rlp.NewBytes(withdrawalsRoot))
 	}
 
+	encoded := enc.MarshalTo(nil)
 	keccak := fastrlp.NewKeccak256()
-	seal := keccak.Sum(enc.MarshalTo(nil))
-	hash, err := hex.DecodeString(block["hash"].(string))
-	if err != nil {
-		return false, err
-	}
-	return bytes.Equal(hash, seal), nil
+	return keccak.Sum(encoded), nil
 }
 
 // main is required for the `wasi` target, even if it isn't used.

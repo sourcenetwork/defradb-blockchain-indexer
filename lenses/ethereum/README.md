@@ -4,7 +4,7 @@ This lens creates a view of sealed blocks.
 
 ## Transform
 
-Blocks are by using the Keccak256 hash of the RLP encoded fields.
+Blocks are sealed using the Keccak256 hash of the RLP encoded fields.
 
 ## Building
 

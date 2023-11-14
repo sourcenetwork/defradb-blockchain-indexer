@@ -9,8 +9,8 @@ import (
 // blockTime is the time between new blocks
 var blockTime = 12 * time.Second
 
-// indexHeadProcess adds block numbers to the given channel every time a new block is added.
-func (i *Indexer) indexHeadProcess(ctx context.Context, blockCh chan<- uint64, head *uint64) error {
+// indexChainProcess adds block numbers to the given channel every time a new block is added.
+func (i *Indexer) indexChainProcess(ctx context.Context, blockCh chan<- uint64, head *uint64) error {
 	for {
 		select {
 		case <-time.Tick(blockTime):
