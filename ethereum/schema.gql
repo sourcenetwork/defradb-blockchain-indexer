@@ -17,17 +17,14 @@ type EthereumHeader {
 }
 
 type EthereumTransaction {
-    type:                 Int
+    type:                 String
     chainId:              String
-    from:                 String
     gas:                  String
     gasPrice:             String
     maxPriorityFeePerGas: String
     maxFeePerBlobGas:     String
-    maxFeePerBlobGas:     String
     accessList:           [EthereumAccessList]
     blobVersionedHashes:  [String]
-    hash:                 String
     input:                String
     nonce:                String
     to:                   String
@@ -35,7 +32,7 @@ type EthereumTransaction {
     v:                    String
     r:                    String
     s:                    String
-    yParity:              Int
+    yParity:              String
 }
 
 type EthereumAccessList {
@@ -49,4 +46,34 @@ type EthereumWithdrawal {
     amount:           String
     validatorIndex:   String
     address:          String
+}
+
+type EthereumReceipt {
+    root:            String
+    cumulateGasUsed: String
+    bloom:           String
+    logs:            [EthereumLog]
+}
+
+type EthereumLog {
+    receipt: EthereumReceipt @primary
+    address: String
+    topics:  [String]
+    data:    String
+}
+
+type EthereumTransactionsProof {
+    transactions: [String]
+}
+
+type EthereumUnclesProof {
+    uncles: [String]
+}
+
+type EthereumWithdrawalsProof {
+    withdrawals: [String]
+}
+
+type EthereumReceiptsProof {
+    receipts: [String]
 }

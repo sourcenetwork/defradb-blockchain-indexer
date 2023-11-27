@@ -6,63 +6,65 @@ import (
 	"github.com/umbracle/fastrlp"
 )
 
-// sealHash returns the hash of a block.
-func sealHash(block map[string]any) ([]byte, error) {
-	parentHash, err := hex.DecodeString(block["parentHash"].(string))
+var rlp = &fastrlp.Arena{}
+
+// seal returns the hash of a header.
+func seal(header map[string]any) ([]byte, error) {
+	parentHash, err := hex.DecodeString(header["parentHash"].(string))
 	if err != nil {
 		return nil, err
 	}
-	sha3Uncles, err := hex.DecodeString(block["sha3Uncles"].(string))
+	sha3Uncles, err := hex.DecodeString(header["sha3Uncles"].(string))
 	if err != nil {
 		return nil, err
 	}
-	miner, err := hex.DecodeString(block["miner"].(string))
+	miner, err := hex.DecodeString(header["miner"].(string))
 	if err != nil {
 		return nil, err
 	}
-	stateRoot, err := hex.DecodeString(block["stateRoot"].(string))
+	stateRoot, err := hex.DecodeString(header["stateRoot"].(string))
 	if err != nil {
 		return nil, err
 	}
-	transactionsRoot, err := hex.DecodeString(block["transactionsRoot"].(string))
+	transactionsRoot, err := hex.DecodeString(header["transactionsRoot"].(string))
 	if err != nil {
 		return nil, err
 	}
-	receiptsRoot, err := hex.DecodeString(block["receiptsRoot"].(string))
+	receiptsRoot, err := hex.DecodeString(header["receiptsRoot"].(string))
 	if err != nil {
 		return nil, err
 	}
-	logsBloom, err := hex.DecodeString(block["logsBloom"].(string))
+	logsBloom, err := hex.DecodeString(header["logsBloom"].(string))
 	if err != nil {
 		return nil, err
 	}
-	difficulty, err := hex.DecodeString(block["difficulty"].(string))
+	difficulty, err := hex.DecodeString(header["difficulty"].(string))
 	if err != nil {
 		return nil, err
 	}
-	number, err := hex.DecodeString(block["number"].(string))
+	number, err := hex.DecodeString(header["number"].(string))
 	if err != nil {
 		return nil, err
 	}
-	gasLimit, err := hex.DecodeString(block["gasLimit"].(string))
+	gasLimit, err := hex.DecodeString(header["gasLimit"].(string))
 	if err != nil {
 		return nil, err
 	}
-	gasUsed, err := hex.DecodeString(block["gasUsed"].(string))
+	gasUsed, err := hex.DecodeString(header["gasUsed"].(string))
 	if err != nil {
 		return nil, err
 	}
-	timestamp, err := hex.DecodeString(block["timestamp"].(string))
+	timestamp, err := hex.DecodeString(header["timestamp"].(string))
 	if err != nil {
 		return nil, err
 	}
-	extraData, err := hex.DecodeString(block["extraData"].(string))
+	extraData, err := hex.DecodeString(header["extraData"].(string))
 	if err != nil {
 		return nil, err
 	}
 
 	var baseFeePerGas []byte
-	if val, ok := block["baseFeePerGas"]; ok {
+	if val, ok := header["baseFeePerGas"]; ok {
 		baseFeePerGas, err = hex.DecodeString(val.(string))
 	}
 	if err != nil {
@@ -70,14 +72,13 @@ func sealHash(block map[string]any) ([]byte, error) {
 	}
 
 	var withdrawalsRoot []byte
-	if val, ok := block["withdrawalsRoot"]; ok {
+	if val, ok := header["withdrawalsRoot"]; ok {
 		withdrawalsRoot, err = hex.DecodeString(val.(string))
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	rlp := &fastrlp.Arena{}
 	enc := rlp.NewArray()
 	enc.Set(rlp.NewBytes(parentHash))
 	enc.Set(rlp.NewBytes(sha3Uncles))
@@ -100,9 +101,11 @@ func sealHash(block map[string]any) ([]byte, error) {
 		enc.Set(rlp.NewBytes(withdrawalsRoot))
 	}
 
-	encoded := enc.MarshalTo(nil)
 	keccak := fastrlp.NewKeccak256()
-	return keccak.Sum(encoded), nil
+	if _, err := keccak.Write(enc.MarshalTo(nil)); err != nil {
+		return nil, err
+	}
+	return keccak.Sum(nil), nil
 }
 
 // main is required for the `wasi` target, even if it isn't used.
